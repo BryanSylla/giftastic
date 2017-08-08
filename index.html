@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giftastic</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row" >
+    <div class="col-xs-12" id="topics-button">
+      
+    </div>
+   </div>
+  <div class="row">
+   
+        <div class="col-xs-9" id="gifs">
+        </div>
+         <div class="col-xs-3" id="add-topic">
+        <form>
+ 
+    <label for="addtopic">Add topic:</label>
+    <input type="text" class="form-control" id="Add-topic">
+
+  
+  <button type="submit" id="addbutton" class="btn btn-default">Submit</button>
+</form>    
+      
+    </div> 
+  </div>
+</div>
+  <script type="text/javascript">
+
+  var topics=["dogs","cats"];
+
+  createbuttons();
+
+
+  
+  function createbuttons(){
+      $("#topics-button").empty();
+  for(i=0;i<topics.length;i++){
+
+    topicbutton=$("<button class='btn btn-primary'>").text(topics[i]);
+    topicbutton.attr("data-topic",topics[i]);
+
+    topicbutton.addClass("gif");
+    $("#topics-button").append(topicbutton);
+
+
+  }
+};
+
+$(document.body).on("click", ".gif", function() {
+  $("#gifs").empty();
+      var topic = $(this).attr("data-topic");
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        topic + "&api_key=dc6zaTOxFJmzC&limit=10";
+console.log(topic);
+console.log(queryURL);
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).done(function(response) {
+        
+
+        console.log(response);
+
+       
+ var results=response.data;
+        // ========================
+
+        for (var i = 0; i < results.length; i++) {
+
+      
+        var topicDiv=$("<div class='col-xs-4'>");
+       
+        var p= $("<p>");
+        
+        p.text("Rating: " + results[i].rating);
+        
+        var topicImage=$("<img>");
+         topicImage.attr("data-state","still");
+         topicImage.addClass("image")
+        
+        topicImage.attr("src", results[i].images.fixed_height_still.url);
+        topicImage.attr("data-still", results[i].images.fixed_height_still.url);
+        topicImage.attr("data-animate", results[i].images.fixed_height.url);
+
+        topicDiv.append(topicImage);
+        topicDiv.append(p);
+       
+         
+      
+$("#gifs").append(topicDiv);
+       
+         }
+
+      });
+    });
+
+$("#addbutton").on("click", function(event) {
+      event.preventDefault();
+
+      var addedtopic = $("#Add-topic").val().trim();
+      if(addedtopic){
+      console.log(addedtopic);
+      topics.push(addedtopic);
+
+createbuttons();
+}
+    
+    });
+$(document.body).on("click", ".image", function() {
+      
+var state=this.getAttribute("data-state")
+console.log(state);
+      
+      if(state=="still"){
+        var link=this.getAttribute("data-animate");
+        $(this).attr("src", link);
+        $(this).attr("data-state", "animate");
+      }
+     
+else{
+  var link=this.getAttribute("data-still");
+   $(this).attr("src", link);
+        $(this).attr("data-state", "still");
+ 
+}
+     });
+ 
+  </script>
+  
+</body>
+
+</html>
